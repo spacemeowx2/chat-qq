@@ -1,31 +1,17 @@
 import * as vscode from 'vscode'
-
-class QQTreeItem extends vscode.TreeItem {
-
-}
-
-export class QQTreeProvider implements vscode.TreeDataProvider<string> {
-	getTreeItem(element: string): vscode.TreeItem {
-		return {
-      label: element
-    }
-  }
-  async getChildren(element?: string): Promise<string[]> {
-    console.log('getChildren', element)
-    if (element === undefined) {
-      return ['UNREADS', 'FRIENDS', 'GROUPS']
-    }
-    return ["asdf"]
-  }
-}
+import { QQUnreadTreeProvider, QQGroupsTreeProvider } from './provider'
+import { QQClient } from './qqclient'
 
 export function activate(context: vscode.ExtensionContext) {
+  const client = new QQClient(context)
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.chatqq.setserver', () => {
       vscode.window.showInformationMessage('Hello World!')
     }),
-    vscode.window.registerTreeDataProvider('chatqq-treeview', new QQTreeProvider())
+    vscode.window.registerTreeDataProvider('chatqq-messages', new QQUnreadTreeProvider(client)),
+    vscode.window.registerTreeDataProvider('chatqq-groups', new QQGroupsTreeProvider(client)),
   )
+
   console.log('chat-qq activate')
 }
 
